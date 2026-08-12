@@ -22,9 +22,10 @@ de intereses pagados y el total pagado al finalizar el crédito.
 
 | Entrada | Tipo | Descripción |
 |---|---|---|
-| `monto_credito` | float | Valor total del crédito educativo a financiar |
+| `monto_credito_semestre` | float | Valor de matricula del semestre a financiar |
 | `tasa_interes` | float | Tasa de interés mensual en decimal (ej. `0.015` = 1.5%) |
 | `plazo` | int | Número de cuotas mensuales para pagar el crédito |
+| `periodo_gracia` | int | Tiempo de espera para comenzar a pagar. Empieza al terminar la carrera. |
 
 ---
 
