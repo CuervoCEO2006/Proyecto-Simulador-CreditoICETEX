@@ -108,6 +108,45 @@ class CreditoEducativoTest(unittest.TestCase):
         self.assertAlmostEqual(total_abonos, total_abonos_calculado, 2)
         self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
 
+ # --- CASOS DE ERROR ---
+
+    def test_monto_cero(self):
+        # ENTRADAS
+        monto_credito = 0
+        interes = 1.5 / 100
+        plazo = 24
+
+        # Verifica que si se genere una excepcion adentro del bloque with
+        with self.assertRaises(logica_credito.MontoInvalido):
+            logica_credito.calcular_cuota(monto_credito, interes, plazo)
+
+    def test_tasa_negativa(self):
+        # ENTRADAS
+        monto_credito = 10_000_000
+        interes = -1 / 100
+        plazo = 24
+
+        with self.assertRaises(logica_credito.TasaInvalida):
+            logica_credito.calcular_cuota(monto_credito, interes, plazo)
+
+    def test_plazo_cero(self):
+        # ENTRADAS
+        monto_credito = 10_000_000
+        interes = 1.5 / 100
+        plazo = 0
+
+        with self.assertRaises(logica_credito.PlazoInvalido):
+            logica_credito.calcular_cuota(monto_credito, interes, plazo)
+
+    def test_plazo_negativo(self):
+        # ENTRADAS
+        monto_credito = 10_000_000
+        interes = 1.5 / 100
+        plazo = -12
+
+        with self.assertRaises(logica_credito.PlazoInvalido):
+            logica_credito.calcular_cuota(monto_credito, interes, plazo)
+
 
 if __name__ == '__main__':
     unittest.main()
