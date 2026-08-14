@@ -108,7 +108,7 @@ class CreditoEducativoTest(unittest.TestCase):
         self.assertAlmostEqual(total_abonos, total_abonos_calculado, 2)
         self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
 
- # --- CASOS DE ERROR ---
+    # --- CASOS DE ERROR ---
 
     def test_monto_cero(self):
         # ENTRADAS
