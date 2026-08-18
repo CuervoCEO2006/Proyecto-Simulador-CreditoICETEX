@@ -1,4 +1,7 @@
-import logica_credito
+import sys
+sys.path.append('src')
+
+from model import logica_credito
 
 
 try:
