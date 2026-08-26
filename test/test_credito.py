@@ -15,16 +15,16 @@ class CreditoEducativoTest(unittest.TestCase):
         plazo = 24
         cuota = 499_241.02
         # SALIDAS ESPERADAS
-        total_abonos = 11_981_784.47
+        total_pagado = 11_981_784.47
         total_intereses = 1_981_784.47
 
         cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_abonos_calculado = logica_credito.calcular_total_abonos(monto_credito, interes, plazo)
+        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
         total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
 
         # Prueba que dos variables sean iguales
         self.assertAlmostEqual(cuota, cuota_calculada, 2)
-        self.assertAlmostEqual(total_abonos, total_abonos_calculado, 2)
+        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
         self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
 
     def test_normal_2(self):
@@ -34,15 +34,15 @@ class CreditoEducativoTest(unittest.TestCase):
         plazo = 12
         cuota = 444_243.94
         # SALIDAS ESPERADAS
-        total_abonos = 5_330_927.32
+        total_pagado = 5_330_927.32
         total_intereses = 330_927.32
 
         cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_abonos_calculado = logica_credito.calcular_total_abonos(monto_credito, interes, plazo)
+        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
         total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
 
         self.assertAlmostEqual(cuota, cuota_calculada, 2)
-        self.assertAlmostEqual(total_abonos, total_abonos_calculado, 2)
+        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
         self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
 
     def test_normal_3(self):
@@ -64,15 +64,15 @@ class CreditoEducativoTest(unittest.TestCase):
         plazo = 6
         # SALIDAS ESPERADAS
         cuota_esperada = 500_000
-        total_abonos = 3_000_000
+        total_pagado = 3_000_000
         total_intereses = 0
 
         cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_abonos_calculado = logica_credito.calcular_total_abonos(monto_credito, interes, plazo)
+        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
         total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
 
         self.assertAlmostEqual(cuota_esperada, cuota_calculada, 2)
-        self.assertAlmostEqual(total_abonos, total_abonos_calculado, 2)
+        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
         self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
 
     def test_cuota_unica(self):
@@ -82,15 +82,15 @@ class CreditoEducativoTest(unittest.TestCase):
         plazo = 1
         # SALIDAS ESPERADAS
         cuota_esperada = 505_000
-        total_abonos = 505_000
+        total_pagado = 505_000
         total_intereses = 5_000
 
         cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_abonos_calculado = logica_credito.calcular_total_abonos(monto_credito, interes, plazo)
+        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
         total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
 
         self.assertAlmostEqual(cuota_esperada, cuota_calculada, 2)
-        self.assertAlmostEqual(total_abonos, total_abonos_calculado, 2)
+        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
         self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
 
     def test_credito_alto_plazo_largo(self):
@@ -100,15 +100,15 @@ class CreditoEducativoTest(unittest.TestCase):
         plazo = 60
         # SALIDAS ESPERADAS
         cuota_esperada = 634_835.69
-        total_abonos = 38_090_141.14
+        total_pagado = 38_090_141.14
         total_intereses = 13_090_141.14
 
         cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_abonos_calculado = logica_credito.calcular_total_abonos(monto_credito, interes, plazo)
+        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
         total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
 
         self.assertAlmostEqual(cuota_esperada, cuota_calculada, 2)
-        self.assertAlmostEqual(total_abonos, total_abonos_calculado, 2)
+        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
         self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
 
     # --- CASOS DE ERROR ---

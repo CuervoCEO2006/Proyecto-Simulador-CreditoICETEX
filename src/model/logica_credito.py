@@ -37,11 +37,11 @@ def calcular_cuota(monto_credito: float, tasa_interes_mensual: float, cantidad_c
         return (monto_credito * tasa_interes_mensual) / (1 - (1 + tasa_interes_mensual) ** (-cantidad_cuotas))
 
 
-def calcular_total_abonos(monto_credito: float, tasa_interes_mensual: float, cantidad_cuotas: int) -> float:
+def calcular_total_pagado(monto_credito: float, tasa_interes_mensual: float, cantidad_cuotas: int) -> float:
     cuota = calcular_cuota(monto_credito, tasa_interes_mensual, cantidad_cuotas)
     return cuota * cantidad_cuotas
 
 
 def calcular_total_intereses(monto_credito: float, tasa_interes_mensual: float, cantidad_cuotas: int) -> float:
-    total_abonos = calcular_total_abonos(monto_credito, tasa_interes_mensual, cantidad_cuotas)
-    return total_abonos - monto_credito
+    total_pagado = calcular_total_pagado(monto_credito, tasa_interes_mensual, cantidad_cuotas)
+    return total_pagado - monto_credito
