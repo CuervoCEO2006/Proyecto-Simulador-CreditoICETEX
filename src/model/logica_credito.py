@@ -1,26 +1,57 @@
 class MontoInvalido(Exception):
-    """ Excepcion que se dispara cuando el monto del credito es cero o negativo """
+    """ Se dispara cuando el monto del credito es menor o igual a cero """
+    def __init__(self, monto_credito):
+        super().__init__(
+            f"MontoInvalido: se recibio monto_credito={monto_credito}, pero el monto del "
+            f"credito debe ser mayor que cero. Ocurrio en validar_monto_credito(), llamada "
+            f"desde calcular_cuota(). Solucion: ingrese un monto de credito positivo."
+        )
+
 
 class PlazoInvalido(Exception):
-    """ Excepcion que se dispara cuando el numero de cuotas es menor que uno """
+    """ Se dispara cuando la cantidad de cuotas es menor que uno """
+    def __init__(self, cantidad_cuotas):
+        super().__init__(
+            f"PlazoInvalido: se recibio cantidad_cuotas={cantidad_cuotas}, pero el numero de "
+            f"cuotas debe ser mayor o igual a uno. Ocurrio en validar_cantidad_cuotas(), "
+            f"llamada desde calcular_cuota(). Solucion: ingrese un plazo de al menos 1 mes."
+        )
+
 
 class TasaInvalida(Exception):
-    """ Se dispara cuando la tasa de interes ingresada es negativa """
+    """ Se dispara cuando la tasa de interes mensual ingresada es negativa """
+    def __init__(self, tasa_interes_mensual):
+        super().__init__(
+            f"TasaInvalida: se recibio tasa_interes_mensual={tasa_interes_mensual} "
+            f"({tasa_interes_mensual * 100}%), pero la tasa de interes no puede ser negativa. "
+            f"Ocurrio en validar_tasa_interes(), llamada desde calcular_cuota(). "
+            f"Solucion: ingrese una tasa mayor o igual a cero."
+        )
+
+
+def validar_monto_credito(monto_credito: float) -> None:
+    """ Verifica que el monto del credito sea mayor que cero. No calcula nada. """
+    if monto_credito <= 0:
+        raise MontoInvalido(monto_credito)
+
+
+def validar_cantidad_cuotas(cantidad_cuotas: int) -> None:
+    """ Verifica que la cantidad de cuotas sea al menos uno. No calcula nada. """
+    if cantidad_cuotas < 1:
+        raise PlazoInvalido(cantidad_cuotas)
+
+
+def validar_tasa_interes(tasa_interes_mensual: float) -> None:
+    """ Verifica que la tasa de interes no sea negativa. No calcula nada. """
+    if tasa_interes_mensual < 0:
+        raise TasaInvalida(tasa_interes_mensual)
 
 
 def validar_parametros_credito(monto_credito: float, tasa_interes_mensual: float, cantidad_cuotas: int) -> None:
-    """
-    Valida que los parametros de entrada del credito educativo sean correctos.
-    No calcula nada, solo verifica y lanza la excepcion correspondiente si algo esta mal.
-    """
-    if monto_credito <= 0:
-        raise MontoInvalido("El monto del credito debe ser mayor que cero")
-
-    if cantidad_cuotas < 1:
-        raise PlazoInvalido("El numero de cuotas debe ser mayor a cero")
-
-    if tasa_interes_mensual < 0:
-        raise TasaInvalida(f"La tasa de interes ingresada {tasa_interes_mensual * 100}% no puede ser negativa")
+    """ Orquesta las tres validaciones individuales. No calcula nada. """
+    validar_monto_credito(monto_credito)
+    validar_cantidad_cuotas(cantidad_cuotas)
+    validar_tasa_interes(tasa_interes_mensual)
 
 
 def calcular_cuota(monto_credito: float, tasa_interes_mensual: float, cantidad_cuotas: int) -> float:
