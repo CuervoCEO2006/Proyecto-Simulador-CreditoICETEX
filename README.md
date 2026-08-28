@@ -39,7 +39,47 @@ Proyecto-Simulador-CreditoICETEX/
 └── README.md
 ```
 
+---
 
+## Pruebas Unitarias
+
+Las pruebas unitarias automatizadas se encuentran en `test/test_credito.py`, y usan
+la libreria `unittest` de Python para validar las funciones de `src/model/logica_credito.py`.
+
+### Distribución de las pruebas
+
+| Tipo de prueba | Descripción |
+|---|---|
+| Normal | `test_normal_1`: crédito de $10.000.000, tasa 1.5% mensual, plazo de 24 meses |
+| Normal | `test_normal_2`: crédito de $5.000.000, tasa 1% mensual, plazo de 12 meses |
+| Normal | `test_normal_3`: crédito de $20.000.000, tasa 1.25% mensual, plazo de 36 meses |
+| Excepcional | `test_tasa_cero`: tasa de interés en 0%, la cuota se calcula como monto / plazo |
+| Excepcional | `test_cuota_unica`: crédito a pagar en una sola cuota (plazo = 1) |
+| Excepcional | `test_credito_alto_plazo_largo`: monto alto ($25.000.000) a un plazo largo (60 meses) |
+| Error | `test_monto_cero`: el monto del crédito es cero, debe lanzar `MontoInvalido` |
+| Error | `test_tasa_negativa`: la tasa de interés es negativa, debe lanzar `TasaInvalida` |
+| Error | `test_plazo_cero`: el plazo es cero, debe lanzar `PlazoInvalido` |
+| Error | `test_plazo_negativo`: el plazo es negativo, debe lanzar `PlazoInvalido` |
+
+### Instrucciones para ejecutar las pruebas
+
+Ubíquese en la raíz del proyecto y ejecute:
+
+```
+python test/test_credito.py
+```
+
+### Resultado esperado
+
+Las 10 pruebas deben pasar sin errores:
+
+```
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.001s
+
+OK
+```
 
 ---
 
