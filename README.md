@@ -121,3 +121,66 @@ Pasos:
 - **Total pagado:** suma de todas las cuotas pagadas durante el plazo.
 
 En caso de datos inválidos, el sistema muestra un mensaje de error indicando qué dato causó el problema.
+
+---
+
+## Instrucciones para ejecutar la interfaz de Consola
+
+La interfaz de usuario se encuentra en `src/view/console/consola_credito.py`.
+Se encarga de pedir los datos al usuario, llamar a las funciones de
+`src/model/logica_credito.py` y mostrar los resultados o el error correspondiente.
+
+### Cómo ejecutarla
+
+Ubíquese en la raíz del proyecto y ejecute:
+
+```
+python src/view/console/consola_credito.py
+```
+
+### Menú principal (lo que se muestra al iniciar)
+
+Al ejecutar el programa, lo primero que se muestra es un mensaje de bienvenida
+seguido de las tres preguntas para ingresar los datos del crédito:
+
+```
+Este programa le permite calcular la cuota a pagar por un credito educativo
+Monto del credito:
+Tasa de interes mensual del credito:
+Numero de cuotas en que va a pagar el credito:
+```
+
+### Proceso de cálculo
+
+1. El programa pide el monto del crédito, la tasa de interés mensual (se ingresa
+   como número entero, ej. `1.5`, y el programa la divide entre 100) y el número
+   de cuotas.
+2. Con esos datos llama a `calcular_cuota()`, `calcular_total_pagado()` y
+   `calcular_total_intereses()` del módulo `logica_credito`.
+3. Si algún dato es inválido, el modelo lanza una excepción (`MontoInvalido`,
+   `PlazoInvalido` o `TasaInvalida`), que la consola captura y muestra como
+   mensaje de error en vez de un resultado numérico.
+4. Si los datos son válidos, se muestran los tres resultados en pantalla.
+
+### Ejemplo de ejecución
+
+```
+Este programa le permite calcular la cuota a pagar por un credito educativo
+Monto del credito: 10000000
+Tasa de interes mensual del credito: 1.5
+Numero de cuotas en que va a pagar el credito: 24
+La cuota mensual a pagar es de: 499241.02
+El total pagado al final del credito es de: 11981784.47
+El total de intereses pagados es de: 1981784.47
+```
+
+Ejemplo con un dato inválido:
+
+```
+Este programa le permite calcular la cuota a pagar por un credito educativo
+Monto del credito: 0
+Tasa de interes mensual del credito: 1.5
+Numero de cuotas en que va a pagar el credito: 24
+No se pudo calcular la cuota
+MontoInvalido: se recibio monto_credito=0.0, pero el monto del credito debe ser mayor que cero. Ocurrio en validar_monto_credito(), llamada desde calcular_cuota(). Solucion: ingrese un monto de credito positivo.
+```
