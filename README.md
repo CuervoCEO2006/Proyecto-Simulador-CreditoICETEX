@@ -18,6 +18,31 @@ de intereses pagados y el total pagado al finalizar el crédito.
 
 ---
 
+## Arquitectura del Proyecto
+
+El proyecto separa la lógica de negocio, la interfaz de usuario y las pruebas en
+capas independientes:
+
+```
+Proyecto-Simulador-CreditoICETEX/
+├── src/
+│   ├── model/
+│   │   └── logica_credito.py
+│   └── view/
+│       └── console/
+│           └── consola_credito.py
+├── test/
+│   └── test_credito.py
+├── doc/
+│   ├── Casos de prueba credito educativo.xlsx
+│   └── Entrevista parte 1 y 2 (audio)
+└── README.md
+```
+
+
+
+---
+
 ## Entradas
 
 | Entrada | Tipo | Descripción |
