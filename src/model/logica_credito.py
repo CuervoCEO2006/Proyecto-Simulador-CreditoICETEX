@@ -5,7 +5,7 @@ TASA_MINIMA = 0
 
 class MontoInvalido(Exception):
     """ Se dispara cuando el monto del credito es menor o igual a cero """
-    def __init__(self, monto_credito):
+    def __init__(self, monto_credito: float):
         super().__init__(
             f"MontoInvalido: se recibio monto_credito={monto_credito}, pero el monto del "
             f"credito debe ser mayor que {MONTO_MINIMO}. Ocurrio en validar_monto_credito(), "
@@ -15,7 +15,7 @@ class MontoInvalido(Exception):
 
 class PlazoInvalido(Exception):
     """ Se dispara cuando la cantidad de cuotas es menor que uno """
-    def __init__(self, cantidad_cuotas):
+    def __init__(self, cantidad_cuotas: int):
         super().__init__(
             f"PlazoInvalido: se recibio cantidad_cuotas={cantidad_cuotas}, pero el numero de "
             f"cuotas debe ser mayor o igual a {CANTIDAD_CUOTAS_MINIMA}. Ocurrio en "
@@ -26,7 +26,7 @@ class PlazoInvalido(Exception):
 
 class TasaInvalida(Exception):
     """ Se dispara cuando la tasa de interes mensual ingresada es negativa """
-    def __init__(self, tasa_interes_mensual):
+    def __init__(self, tasa_interes_mensual: float):
         super().__init__(
             f"TasaInvalida: se recibio tasa_interes_mensual={tasa_interes_mensual} "
             f"({tasa_interes_mensual * 100}%), pero la tasa de interes no puede ser menor que "
