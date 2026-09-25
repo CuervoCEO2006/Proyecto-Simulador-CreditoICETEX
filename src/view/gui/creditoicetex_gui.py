@@ -9,6 +9,8 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.popup import Popup
+from kivy.uix.gridlayout import GridLayout
 
 from model import logica_credito
 
@@ -105,6 +107,9 @@ class CreditoICETEXApp(App):
         boton_calcular = Button(text='Calcular',bold=True,font_size='16sp')
         boton_calcular.bind(on_press=self.calcular)
         botones.add_widget(boton_calcular)
+        boton_tabla = Button(text='Ver Tabla',font_size='16sp')
+        boton_tabla.bind(on_press=self.mostrar_tabla_amortizacion)
+        botones.add_widget(boton_tabla)
         boton_limpiar = Button(text='Limpiar',font_size='16sp')
 
         boton_limpiar.bind(on_press=self.limpiar)
@@ -239,6 +244,72 @@ class CreditoICETEXApp(App):
             f'Total pagado: $ {total_pagado:,.2f}\n'
             f'Total intereses: $ {total_intereses:,.2f}'
         )
+
+    def mostrar_tabla_amortizacion(self, sender):
+        # 1. Leer y validar los datos del formulario
+        try:
+            (monto_credito, tasa_interes_mensual, cantidad_cuotas) = self._leer_datos_formulario()
+            cuota_mensual = logica_credito.calcular_cuota(monto_credito, tasa_interes_mensual, cantidad_cuotas)
+        except ValueError:
+            self._mostrar_error('Por favor complete los tres campos con numeros validos.')
+            return
+        except Exception as e:
+            self._mostrar_error(str(e))
+            return
+
+        # 2. Construir el contenido del popup
+        contenido = BoxLayout(orientation='vertical', padding=10, spacing=10)
+
+        # Color claro para que se vea sobre el fondo oscuro del popup
+        color_popup = (1, 1, 1, 1)
+
+        # Encabezados de la tabla
+        encabezados = GridLayout(cols=5, size_hint_y=None, height=40)
+        encabezados.add_widget(Label(text='Mes', bold=True, color=color_popup))
+        encabezados.add_widget(Label(text='Cuota', bold=True, color=color_popup))
+        encabezados.add_widget(Label(text='Interes', bold=True, color=color_popup))
+        encabezados.add_widget(Label(text='Capital', bold=True, color=color_popup))
+        encabezados.add_widget(Label(text='Saldo', bold=True, color=color_popup))
+        contenido.add_widget(encabezados)
+
+        # Tabla scrollable con las filas
+        scroll_tabla = ScrollView(size_hint=(1, 1))
+        tabla = GridLayout(cols=5, size_hint_y=None, row_default_height=30)
+        tabla.bind(minimum_height=tabla.setter('height'))
+
+        saldo = monto_credito
+        for i in range(1, cantidad_cuotas + 1):
+            if tasa_interes_mensual == logica_credito.TASA_MINIMA:
+                interes = 0.0
+                abono = cuota_mensual
+            else:
+                interes = saldo * tasa_interes_mensual
+                abono = cuota_mensual - interes
+
+            saldo -= abono
+            if saldo < 0 or i == cantidad_cuotas:
+                saldo = 0.0
+
+            tabla.add_widget(Label(text=str(i), color=color_popup))
+            tabla.add_widget(Label(text=f'${interes + abono:,.2f}', color=color_popup))
+            tabla.add_widget(Label(text=f'${interes:,.2f}', color=color_popup))
+            tabla.add_widget(Label(text=f'${abono:,.2f}', color=color_popup))
+            tabla.add_widget(Label(text=f'${saldo:,.2f}', color=color_popup))
+
+        scroll_tabla.add_widget(tabla)
+        contenido.add_widget(scroll_tabla)
+
+        # Boton para cerrar el popup
+        cerrar = Button(text='Cerrar', size_hint_y=None, height=40)
+        contenido.add_widget(cerrar)
+
+        popup = Popup(
+            title='Tabla de Amortizacion',
+            content=contenido,
+            size_hint=(0.9, 0.9),
+        )
+        cerrar.bind(on_press=popup.dismiss)
+        popup.open()
 
 
 if __name__ == '__main__':
