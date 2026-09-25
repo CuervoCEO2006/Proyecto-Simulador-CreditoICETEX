@@ -264,7 +264,14 @@ python src/view/gui/creditoicetex_gui.py
 4. Si algún dato es inválido (monto en cero, tasa negativa, plazo menor a 1,
    o un campo vacío), se muestra en **rojo** un mensaje de error amigable,
    sin detalles técnicos, en vez de un resultado numérico.
-5. El botón **Limpiar** borra los tres campos y el resultado, para hacer
+5. Dé clic en el botón **Ver Tabla** para abrir una ventana emergente con la
+   tabla de amortización completa. La tabla muestra, para cada mes:
+   - **Mes:** número de la cuota.
+   - **Cuota:** valor total de la cuota (interés + abono a capital).
+   - **Interés:** porción de la cuota destinada a intereses.
+   - **Capital:** porción de la cuota que abona al saldo del crédito.
+   - **Saldo:** saldo restante del crédito después del abono.
+6. El botón **Limpiar** borra los tres campos y el resultado, para hacer
    una nueva simulación sin cerrar la aplicación.
 ### Funcionalidades destacadas de la GUI
  
@@ -273,6 +280,8 @@ python src/view/gui/creditoicetex_gui.py
   (`input_filter`), evitando errores de digitación antes de calcular.
 - **Retroalimentación visual:** el resultado cambia de color según si el
   cálculo fue exitoso (verde) o hubo un error (rojo).
+- **Tabla de amortización:** ventana emergente con scroll que detalla
+  mes a mes la composición de cada cuota (interés, capital y saldo).
 - **Botón Limpiar:** funcionalidad adicional para reiniciar el formulario
   sin reiniciar la aplicación.
 - **Manejo de excepciones:** cada excepción del modelo (`MontoInvalido`,
@@ -295,9 +304,13 @@ Cuota mensual: $ 499,241.02
 Total pagado: $ 11,981,784.47
 Total intereses: $ 1,981,784.47
 ```
- 
-Al dar clic en Calcular, se muestra en verde:
 
-Cuota mensual: $ 499,241.02
-Total pagado: $ 11,981,784.47
-Total intereses: $ 1,981,784.47
+Al dar clic en **Ver Tabla**, se abre una ventana con la tabla de amortización:
+
+```
+Mes  |  Cuota        |  Interés      |  Capital      |  Saldo
+1    |  $499,241.02  |  $150,000.00  |  $349,241.02  |  $9,650,758.98
+2    |  $499,241.02  |  $144,761.38  |  $354,479.64  |  $9,296,279.35
+...  |  ...          |  ...          |  ...          |  ...
+24   |  $499,241.02  |  $7,362.06    |  $491,878.96  |  $0.00
+```
