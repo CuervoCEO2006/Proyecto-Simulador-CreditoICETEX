@@ -1,8 +1,5 @@
-import sys
-sys.path.append('src')
-
 import unittest
-from model import logica_credito
+from src.model import logica_credito
 
 class CreditoEducativoTest(unittest.TestCase):
 
