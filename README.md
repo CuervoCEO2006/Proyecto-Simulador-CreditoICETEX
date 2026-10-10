@@ -26,13 +26,20 @@ capas independientes:
 ```
 Proyecto-Simulador-CreditoICETEX/
 ├── src/
+│   ├── controller/
+│   │   └── simulaciones_credito_controller.py
 │   ├── model/
 │   │   └── logica_credito.py
 │   └── view/
 │       └── console/
 │           └── consola_credito.py
 ├── test/
+│   ├── test_simulaciones_credito_controller.py
 │   └── test_credito.py
+├── sql/
+│   ├── crear_simulaciones_credito.sql
+│   ├── insertar_simulacion_credito.sql
+│   └── buscar_simulaciones_credito.sql
 ├── doc/
 │   ├── Casos de prueba credito educativo.xlsx
 │   └── Entrevista parte 1 y 2 (audio)
@@ -43,42 +50,15 @@ Proyecto-Simulador-CreditoICETEX/
 
 ## Pruebas Unitarias
 
-Las pruebas unitarias automatizadas se encuentran en `test/test_credito.py`, y usan
-la libreria `unittest` de Python para validar las funciones de `src/model/logica_credito.py`.
+Las pruebas automatizadas usan `unittest`: `test/test_credito.py` cubre los
+cálculos del crédito educativo y `test/test_simulaciones_credito_controller.py`
+verifica el guardado, consulta y eliminación del historial con una conexión
+simulada, sin necesitar una base de datos activa.
 
-### Distribución de las pruebas
-
-| Tipo de prueba | Descripción |
-|---|---|
-| Normal | `test_normal_1`: crédito de $10.000.000, tasa 1.5% mensual, plazo de 24 meses |
-| Normal | `test_normal_2`: crédito de $5.000.000, tasa 1% mensual, plazo de 12 meses |
-| Normal | `test_normal_3`: crédito de $20.000.000, tasa 1.25% mensual, plazo de 36 meses |
-| Excepcional | `test_tasa_cero`: tasa de interés en 0%, la cuota se calcula como monto / plazo |
-| Excepcional | `test_cuota_unica`: crédito a pagar en una sola cuota (plazo = 1) |
-| Excepcional | `test_credito_alto_plazo_largo`: monto alto ($25.000.000) a un plazo largo (60 meses) |
-| Error | `test_monto_cero`: el monto del crédito es cero, debe lanzar `MontoInvalido` |
-| Error | `test_tasa_negativa`: la tasa de interés es negativa, debe lanzar `TasaInvalida` |
-| Error | `test_plazo_cero`: el plazo es cero, debe lanzar `PlazoInvalido` |
-| Error | `test_plazo_negativo`: el plazo es negativo, debe lanzar `PlazoInvalido` |
-
-### Instrucciones para ejecutar las pruebas
-
-Ubíquese en la raíz del proyecto y ejecute:
+Desde la raíz del proyecto, ejecute:
 
 ```
-python test/test_credito.py
-```
-
-### Resultado esperado
-
-Las 10 pruebas deben pasar sin errores:
-
-```
-..........
-----------------------------------------------------------------------
-Ran 10 tests in 0.001s
-
-OK
+python -m unittest test.test_credito test.test_simulaciones_credito_controller
 ```
 
 ---
@@ -184,3 +164,28 @@ Numero de cuotas en que va a pagar el credito: 24
 No se pudo calcular la cuota
 MontoInvalido: se recibio monto_credito=0.0, pero el monto del credito debe ser mayor que cero. Ocurrio en validar_monto_credito(), llamada desde calcular_cuota(). Solucion: ingrese un monto de credito positivo.
 ```
+
+---
+
+## Historial de simulaciones ICETEX
+
+El controlador guarda el valor de matrícula por semestre, la cantidad de
+semestres, la tasa mensual, el plazo, el periodo de gracia y los resultados de
+la simulación. No almacena datos de tarjetas de crédito. Los métodos disponibles
+son `guardar(solicitud)`, `listar()`, `buscar(id_simulacion)` y
+`eliminar(id_simulacion)`.
+
+Para habilitar PostgreSQL:
+
+1. Instale el controlador de base de datos con `pip install -r requirements.txt`.
+2. Configure la variable de entorno `DATABASE_URL` con la cadena de conexión
+   de su base PostgreSQL (`postgresql://usuario:contraseña@host:5432/base`).
+   No incluya credenciales directamente en el código.
+3. Ejecute `sql/crear_simulaciones_credito.sql` contra esa base de datos.
+4. Corra las pruebas con `python -m unittest test.test_credito test.test_simulaciones_credito_controller`.
+
+El historial puede usarse desde Python construyendo una instancia de
+`SolicitudCredito` del modelo y pasándola a
+`SimulacionesCreditoController.guardar()`. Los scripts restantes permiten
+insertar una simulación de ejemplo y consultar el historial directamente desde
+PostgreSQL.

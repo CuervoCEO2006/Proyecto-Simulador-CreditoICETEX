@@ -2,7 +2,18 @@ import sys
 sys.path.append('src')
 
 import unittest
-from model import logica_credito
+from model.logica_credito import (
+    SolicitudCredito,
+    calcular_cuota,
+    calcular_total_pagado,
+    calcular_total_intereses,
+    MontoInvalido,
+    SemestresInvalidos,
+    TasaInvalida,
+    PlazoInvalido,
+    PeriodoGraciaInvalido,
+)
+
 
 class CreditoEducativoTest(unittest.TestCase):
 
@@ -10,145 +21,126 @@ class CreditoEducativoTest(unittest.TestCase):
 
     def test_normal_1(self):
         # ENTRADAS
-        monto_credito = 10_000_000
-        interes = 1.5 / 100
-        plazo = 24
-        cuota = 499_241.02
+        solicitud = SolicitudCredito(
+            monto_credito_semestre=2_000_000,
+            cantidad_semestres=5,
+            tasa_interes_mensual=1.5 / 100,
+            cantidad_cuotas=36,
+            periodo_gracia=6,
+        )
         # SALIDAS ESPERADAS
-        total_pagado = 11_981_784.47
-        total_intereses = 1_981_784.47
+        cuota = 395_305.93
+        total_pagado = 14_231_013.61
+        total_intereses = 4_231_013.61
 
-        cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
-        total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
-
-        # Prueba que dos variables sean iguales
-        self.assertAlmostEqual(cuota, cuota_calculada, 2)
-        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
-        self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
+        self.assertAlmostEqual(cuota, calcular_cuota(solicitud), 2)
+        self.assertAlmostEqual(total_pagado, calcular_total_pagado(solicitud), 2)
+        self.assertAlmostEqual(total_intereses, calcular_total_intereses(solicitud), 2)
 
     def test_normal_2(self):
-        # ENTRADAS
-        monto_credito = 5_000_000
-        interes = 1 / 100
-        plazo = 12
-        cuota = 444_243.94
-        # SALIDAS ESPERADAS
-        total_pagado = 5_330_927.32
-        total_intereses = 330_927.32
+        solicitud = SolicitudCredito(
+            monto_credito_semestre=1_500_000,
+            cantidad_semestres=4,
+            tasa_interes_mensual=1 / 100,
+            cantidad_cuotas=24,
+            periodo_gracia=4,
+        )
+        cuota = 293_909.06
+        total_pagado = 7_053_817.53
+        total_intereses = 1_053_817.53
 
-        cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
-        total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
-
-        self.assertAlmostEqual(cuota, cuota_calculada, 2)
-        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
-        self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
+        self.assertAlmostEqual(cuota, calcular_cuota(solicitud), 2)
+        self.assertAlmostEqual(total_pagado, calcular_total_pagado(solicitud), 2)
+        self.assertAlmostEqual(total_intereses, calcular_total_intereses(solicitud), 2)
 
     def test_normal_3(self):
-        # ENTRADAS
-        monto_credito = 20_000_000
-        tasa = 1.25 / 100
-        plazo = 36
-        cuota = 693_306.57
+        solicitud = SolicitudCredito(
+            monto_credito_semestre=3_000_000,
+            cantidad_semestres=6,
+            tasa_interes_mensual=1.25 / 100,
+            cantidad_cuotas=48,
+            periodo_gracia=12,
+        )
+        cuota = 581_484.0
 
-        resultado = logica_credito.calcular_cuota(monto_credito, tasa, plazo)
-        self.assertEqual(cuota, round(resultado, 2))
+        self.assertEqual(cuota, round(calcular_cuota(solicitud), 2))
 
     # --- CASOS EXTRAORDINARIOS ---
 
     def test_tasa_cero(self):
-        # ENTRADAS
-        monto_credito = 3_000_000
-        interes = 0 / 100
-        plazo = 6
-        # SALIDAS ESPERADAS
-        cuota_esperada = 500_000
-        total_pagado = 3_000_000
-        total_intereses = 0
+        solicitud = SolicitudCredito(
+            monto_credito_semestre=1_000_000,
+            cantidad_semestres=2,
+            tasa_interes_mensual=0,
+            cantidad_cuotas=12,
+            periodo_gracia=6,
+        )
+        cuota_esperada = 166_666.67
+        total_pagado = 2_000_000.0
+        total_intereses = 0.0
 
-        cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
-        total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
+        self.assertAlmostEqual(cuota_esperada, calcular_cuota(solicitud), 2)
+        self.assertAlmostEqual(total_pagado, calcular_total_pagado(solicitud), 2)
+        self.assertAlmostEqual(total_intereses, calcular_total_intereses(solicitud), 2)
 
-        self.assertAlmostEqual(cuota_esperada, cuota_calculada, 2)
-        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
-        self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
+    def test_sin_periodo_de_gracia(self):
+        solicitud = SolicitudCredito(
+            monto_credito_semestre=800_000,
+            cantidad_semestres=1,
+            tasa_interes_mensual=1 / 100,
+            cantidad_cuotas=6,
+            periodo_gracia=0,
+        )
+        cuota_esperada = 138_038.69
+        total_pagado = 828_232.16
+        total_intereses = 28_232.16
+
+        self.assertAlmostEqual(cuota_esperada, calcular_cuota(solicitud), 2)
+        self.assertAlmostEqual(total_pagado, calcular_total_pagado(solicitud), 2)
+        self.assertAlmostEqual(total_intereses, calcular_total_intereses(solicitud), 2)
 
     def test_cuota_unica(self):
-        # ENTRADAS
-        monto_credito = 500_000
-        interes = 1 / 100
-        plazo = 1
-        # SALIDAS ESPERADAS
-        cuota_esperada = 505_000
-        total_pagado = 505_000
-        total_intereses = 5_000
+        solicitud = SolicitudCredito(
+            monto_credito_semestre=500_000,
+            cantidad_semestres=1,
+            tasa_interes_mensual=1 / 100,
+            cantidad_cuotas=1,
+            periodo_gracia=0,
+        )
+        cuota_esperada = 505_000.0
+        total_pagado = 505_000.0
+        total_intereses = 5_000.0
 
-        cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
-        total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
-
-        self.assertAlmostEqual(cuota_esperada, cuota_calculada, 2)
-        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
-        self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
-
-    def test_credito_alto_plazo_largo(self):
-        # ENTRADAS
-        monto_credito = 25_000_000
-        interes = 1.5 / 100
-        plazo = 60
-        # SALIDAS ESPERADAS
-        cuota_esperada = 634_835.69
-        total_pagado = 38_090_141.14
-        total_intereses = 13_090_141.14
-
-        cuota_calculada = logica_credito.calcular_cuota(monto_credito, interes, plazo)
-        total_pagado_calculado = logica_credito.calcular_total_pagado(monto_credito, interes, plazo)
-        total_intereses_calculado = logica_credito.calcular_total_intereses(monto_credito, interes, plazo)
-
-        self.assertAlmostEqual(cuota_esperada, cuota_calculada, 2)
-        self.assertAlmostEqual(total_pagado, total_pagado_calculado, 2)
-        self.assertAlmostEqual(total_intereses, total_intereses_calculado, 2)
+        self.assertAlmostEqual(cuota_esperada, calcular_cuota(solicitud), 2)
+        self.assertAlmostEqual(total_pagado, calcular_total_pagado(solicitud), 2)
+        self.assertAlmostEqual(total_intereses, calcular_total_intereses(solicitud), 2)
 
     # --- CASOS DE ERROR ---
 
-    def test_monto_cero(self):
-        # ENTRADAS
-        monto_credito = 0
-        interes = 1.5 / 100
-        plazo = 24
+    def test_monto_semestre_cero(self):
+        solicitud = SolicitudCredito(0, 5, 1.5 / 100, 24, 6)
+        with self.assertRaises(MontoInvalido):
+            calcular_cuota(solicitud)
 
-        # Verifica que si se genere una excepcion adentro del bloque with
-        with self.assertRaises(logica_credito.MontoInvalido):
-            logica_credito.calcular_cuota(monto_credito, interes, plazo)
+    def test_cantidad_semestres_invalida(self):
+        solicitud = SolicitudCredito(2_000_000, 0, 1.5 / 100, 24, 6)
+        with self.assertRaises(SemestresInvalidos):
+            calcular_cuota(solicitud)
 
     def test_tasa_negativa(self):
-        # ENTRADAS
-        monto_credito = 10_000_000
-        interes = -1 / 100
-        plazo = 24
-
-        with self.assertRaises(logica_credito.TasaInvalida):
-            logica_credito.calcular_cuota(monto_credito, interes, plazo)
+        solicitud = SolicitudCredito(2_000_000, 5, -1 / 100, 24, 6)
+        with self.assertRaises(TasaInvalida):
+            calcular_cuota(solicitud)
 
     def test_plazo_cero(self):
-        # ENTRADAS
-        monto_credito = 10_000_000
-        interes = 1.5 / 100
-        plazo = 0
+        solicitud = SolicitudCredito(2_000_000, 5, 1.5 / 100, 0, 6)
+        with self.assertRaises(PlazoInvalido):
+            calcular_cuota(solicitud)
 
-        with self.assertRaises(logica_credito.PlazoInvalido):
-            logica_credito.calcular_cuota(monto_credito, interes, plazo)
-
-    def test_plazo_negativo(self):
-        # ENTRADAS
-        monto_credito = 10_000_000
-        interes = 1.5 / 100
-        plazo = -12
-
-        with self.assertRaises(logica_credito.PlazoInvalido):
-            logica_credito.calcular_cuota(monto_credito, interes, plazo)
+    def test_periodo_gracia_negativo(self):
+        solicitud = SolicitudCredito(2_000_000, 5, 1.5 / 100, 24, -1)
+        with self.assertRaises(PeriodoGraciaInvalido):
+            calcular_cuota(solicitud)
 
 
 if __name__ == '__main__':
