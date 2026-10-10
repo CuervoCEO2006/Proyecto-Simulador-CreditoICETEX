@@ -14,7 +14,6 @@ from model.logica_credito import (
     PeriodoGraciaInvalido,
 )
 
-
 class CreditoEducativoTest(unittest.TestCase):
 
     # --- CASOS NORMALES ---
