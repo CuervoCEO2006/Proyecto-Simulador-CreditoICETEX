@@ -94,6 +94,14 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
         self.assertEqual(42, result["id"])
         self.assertEqual(1_500_000, result["monto_credito_semestre"])
         self.assertEqual(4, result["periodo_gracia"])
+        solicitud_reconstruida = SolicitudCredito(
+            monto_credito_semestre=float(result["monto_credito_semestre"]),
+            cantidad_semestres=result["cantidad_semestres"],
+            tasa_interes_mensual=float(result["tasa_interes_mensual"]),
+            cantidad_cuotas=result["cantidad_cuotas"],
+            periodo_gracia=result["periodo_gracia"],
+        )
+        self.assertEqual(self.solicitud, solicitud_reconstruida)
         self.cursor.execute.assert_called_once_with(unittest.mock.ANY, (42,))
 
     @patch.object(SimulacionesCreditoController, "_connect")

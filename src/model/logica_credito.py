@@ -83,6 +83,17 @@ class SolicitudCredito:
         """ Valor total desembolsado: lo que vale cada semestre por la cantidad de semestres. """
         return self.monto_credito_semestre * self.cantidad_semestres
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SolicitudCredito):
+            return NotImplemented
+        return (
+            self.monto_credito_semestre == other.monto_credito_semestre
+            and self.cantidad_semestres == other.cantidad_semestres
+            and self.tasa_interes_mensual == other.tasa_interes_mensual
+            and self.cantidad_cuotas == other.cantidad_cuotas
+            and self.periodo_gracia == other.periodo_gracia
+        )
+
 
 def validar_monto_credito_semestre(monto_credito_semestre: float) -> None:
     """ Verifica que el valor del semestre sea mayor que el minimo permitido. No calcula nada. """

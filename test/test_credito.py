@@ -16,6 +16,18 @@ from model.logica_credito import (
 
 class CreditoEducativoTest(unittest.TestCase):
 
+    def test_solicitudes_con_los_mismos_datos_son_iguales(self):
+        solicitud = SolicitudCredito(1_500_000, 4, 0.01, 24, 4)
+        solicitud_reconstruida = SolicitudCredito(1_500_000, 4, 0.01, 24, 4)
+
+        self.assertEqual(solicitud, solicitud_reconstruida)
+
+    def test_solicitudes_con_datos_diferentes_no_son_iguales(self):
+        solicitud = SolicitudCredito(1_500_000, 4, 0.01, 24, 4)
+        solicitud_diferente = SolicitudCredito(1_500_000, 4, 0.01, 24, 5)
+
+        self.assertNotEqual(solicitud, solicitud_diferente)
+
     # --- CASOS NORMALES ---
 
     def test_normal_1(self):
