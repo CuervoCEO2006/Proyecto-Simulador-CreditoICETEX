@@ -223,9 +223,8 @@ son `guardar(solicitud)`, `listar()`, `buscar(id_simulacion)` y
 Para habilitar PostgreSQL:
 
 1. Instale el controlador de base de datos con `pip install -r requirements.txt`.
-2. Configure la variable de entorno `DATABASE_URL` con la cadena de conexión
-   de su base PostgreSQL (`postgresql://usuario:contraseña@host:5432/base`).
-   No incluya credenciales directamente en el código.
+2. Copie `secret_config.example.py` como `secret_config.py` en la raíz del
+   proyecto y configure allí los datos locales de conexión PostgreSQL.
 3. Ejecute `sql/crear_simulaciones_credito.sql` contra esa base de datos.
 4. Corra las pruebas con `python -m unittest test.test_credito test.test_simulaciones_credito_controller`.
 

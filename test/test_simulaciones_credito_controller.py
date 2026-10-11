@@ -1,4 +1,5 @@
 import sys
+import sys
 import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -21,6 +22,42 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
         self.connection = MagicMock()
         self.cursor = MagicMock()
         self.connection.cursor.return_value.__enter__.return_value = self.cursor
+
+    def test_connect_usa_credenciales_de_secret_config(self):
+        secret_config = SimpleNamespace(
+            PG_HOST="db.example.test",
+            PG_DATABASE="credito_test",
+            PG_USER="tester",
+            PG_PASSWORD="local-only",
+            PG_PORT=5433,
+        )
+        postgres = SimpleNamespace(connect=MagicMock(return_value=self.connection))
+        with patch.dict(
+            sys.modules,
+            {"secret_config": secret_config, "psycopg2": postgres},
+        ):
+            connection = SimulacionesCreditoController._connect()
+
+        self.assertIs(self.connection, connection)
+        postgres.connect.assert_called_once_with(
+            host="db.example.test",
+            dbname="credito_test",
+            user="tester",
+            password="local-only",
+            port=5433,
+        )
+
+    def test_connect_informa_si_secret_config_no_tiene_credenciales(self):
+        secret_config = SimpleNamespace(
+            PG_HOST="",
+            PG_DATABASE="",
+            PG_USER="",
+            PG_PASSWORD="",
+            PG_PORT=5432,
+        )
+        with patch.dict(sys.modules, {"secret_config": secret_config}):
+            with self.assertRaisesRegex(RuntimeError, "secret_config.py"):
+                SimulacionesCreditoController._connect()
 
     @patch.object(SimulacionesCreditoController, "_connect")
     def test_guardar_persist_credito_educativo_y_devuelve_id(self, connect):
@@ -159,6 +196,25 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
             "DELETE FROM simulaciones_credito WHERE id = %s",
             (42,),
         )
+
+    @patch.object(SimulacionesCreditoController, "_connect")
+    def test_limpieza_rechaza_una_base_que_no_es_de_pruebas(self, connect):
+        connect.return_value = self.connection
+        self.cursor.fetchone.return_value = ("simulador_credito",)
+
+        with self.assertRaisesRegex(RuntimeError, "termine en '_test'"):
+            SimulacionesCreditoController._limpiar_tabla_para_pruebas()
+
+        self.cursor.execute.assert_called_once_with("SELECT current_database()")
+
+    @patch.object(SimulacionesCreditoController, "_connect")
+    def test_limpieza_vacia_la_tabla_solo_en_base_de_pruebas(self, connect):
+        connect.return_value = self.connection
+        self.cursor.fetchone.return_value = ("simulador_credito_test",)
+
+        SimulacionesCreditoController._limpiar_tabla_para_pruebas()
+
+        self.cursor.execute.assert_any_call("DELETE FROM simulaciones_credito")
 
 
 if __name__ == "__main__":
