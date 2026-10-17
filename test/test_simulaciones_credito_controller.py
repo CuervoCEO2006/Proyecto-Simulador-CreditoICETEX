@@ -1,6 +1,6 @@
 import sys
-import sys
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -198,6 +198,13 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
         )
 
     @patch.object(SimulacionesCreditoController, "_connect")
+    def test_eliminar_inexistente_devuelve_false(self, connect):
+        connect.return_value = self.connection
+        self.cursor.rowcount = 0
+
+        self.assertFalse(SimulacionesCreditoController.eliminar(999))
+
+    @patch.object(SimulacionesCreditoController, "_connect")
     def test_limpieza_rechaza_una_base_que_no_es_de_pruebas(self, connect):
         connect.return_value = self.connection
         self.cursor.fetchone.return_value = ("simulador_credito",)
@@ -215,6 +222,38 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
         SimulacionesCreditoController._limpiar_tabla_para_pruebas()
 
         self.cursor.execute.assert_any_call("DELETE FROM simulaciones_credito")
+
+    @patch.object(Path, "read_text", return_value="CREATE TABLE simulaciones_credito (id INT);")
+    @patch.object(SimulacionesCreditoController, "_connect")
+    def test_recrear_tabla_solo_en_base_de_pruebas(
+        self, connect, read_schema
+    ):
+        connect.return_value = self.connection
+        self.cursor.fetchone.return_value = ("simulador_credito_test",)
+
+        SimulacionesCreditoController._recrear_tabla_para_pruebas()
+
+        self.cursor.execute.assert_any_call(
+            "DROP TABLE IF EXISTS simulaciones_credito"
+        )
+        self.cursor.execute.assert_any_call(
+            "CREATE TABLE simulaciones_credito (id INT);"
+        )
+        read_schema.assert_called_once_with(encoding="utf-8")
+
+    @patch.object(Path, "read_text")
+    @patch.object(SimulacionesCreditoController, "_connect")
+    def test_recrear_tabla_rechaza_una_base_que_no_es_de_pruebas(
+        self, connect, read_schema
+    ):
+        connect.return_value = self.connection
+        self.cursor.fetchone.return_value = ("simulador_credito",)
+
+        with self.assertRaisesRegex(RuntimeError, "termine en '_test'"):
+            SimulacionesCreditoController._recrear_tabla_para_pruebas()
+
+        self.cursor.execute.assert_called_once_with("SELECT current_database()")
+        read_schema.assert_called_once_with(encoding="utf-8")
 
 
 if __name__ == "__main__":

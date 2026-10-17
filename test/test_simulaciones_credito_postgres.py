@@ -1,12 +1,15 @@
 import os
 import sys
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from unittest.mock import patch
 
 sys.path.append("src")
 
 from controller.simulaciones_credito_controller import SimulacionesCreditoController
-from model.logica_credito import SolicitudCredito
+from model.logica_credito import MontoInvalido, SolicitudCredito
+from view.console import historial_simulaciones
 
 
 @unittest.skipUnless(
@@ -33,7 +36,7 @@ class SimulacionesCreditoPostgresTest(unittest.TestCase):
         cls.database_config.stop()
 
     def setUp(self):
-        SimulacionesCreditoController._limpiar_tabla_para_pruebas()
+        SimulacionesCreditoController._recrear_tabla_para_pruebas()
         self.solicitud = SolicitudCredito(
             monto_credito_semestre=1_500_000,
             cantidad_semestres=4,
@@ -63,6 +66,12 @@ class SimulacionesCreditoPostgresTest(unittest.TestCase):
     def test_buscar_devuelve_none_si_no_existe(self):
         self.assertIsNone(SimulacionesCreditoController.buscar(-1))
 
+    def test_no_inserta_una_solicitud_invalida(self):
+        solicitud_invalida = SolicitudCredito(0, 4, 0.01, 24, 4)
+
+        with self.assertRaises(MontoInvalido):
+            SimulacionesCreditoController.guardar(solicitud_invalida)
+
     def test_listar_devuelve_las_simulaciones_guardadas(self):
         id_simulacion = SimulacionesCreditoController.guardar(self.solicitud)
 
@@ -76,6 +85,23 @@ class SimulacionesCreditoPostgresTest(unittest.TestCase):
 
         self.assertTrue(SimulacionesCreditoController.eliminar(id_simulacion))
         self.assertIsNone(SimulacionesCreditoController.buscar(id_simulacion))
+
+    def test_eliminar_inexistente_devuelve_false(self):
+        self.assertFalse(SimulacionesCreditoController.eliminar(-1))
+
+    @patch(
+        "builtins.input",
+        side_effect=["1", "1500000", "4", "1", "24", "4", "2", "1", "0"],
+    )
+    def test_consola_guarda_y_busca_una_simulacion(self, input_mock):
+        output = StringIO()
+
+        with redirect_stdout(output):
+            historial_simulaciones.main()
+
+        self.assertIn("Simulacion guardada con ID: 1", output.getvalue())
+        self.assertIn("ID: 1", output.getvalue())
+        self.assertIn("Cuota mensual: 293,909.06", output.getvalue())
 
 
 if __name__ == "__main__":

@@ -83,9 +83,9 @@ class SolicitudCredito:
         """ Valor total desembolsado: lo que vale cada semestre por la cantidad de semestres. """
         return self.monto_credito_semestre * self.cantidad_semestres
 
-    def __eq__(self, other: object) -> bool:
+    def is_equal(self, other: object) -> bool:
         if not isinstance(other, SolicitudCredito):
-            return NotImplemented
+            return False
         return (
             self.monto_credito_semestre == other.monto_credito_semestre
             and self.cantidad_semestres == other.cantidad_semestres
@@ -93,6 +93,11 @@ class SolicitudCredito:
             and self.cantidad_cuotas == other.cantidad_cuotas
             and self.periodo_gracia == other.periodo_gracia
         )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SolicitudCredito):
+            return NotImplemented
+        return self.is_equal(other)
 
 
 def validar_monto_credito_semestre(monto_credito_semestre: float) -> None:

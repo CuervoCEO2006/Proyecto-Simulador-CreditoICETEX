@@ -223,16 +223,46 @@ son `guardar(solicitud)`, `listar()`, `buscar(id_simulacion)` y
 Para habilitar PostgreSQL:
 
 1. Instale el controlador de base de datos con `pip install -r requirements.txt`.
-2. Copie `secret_config.example.py` como `secret_config.py` en la raíz del
-   proyecto y configure allí los datos locales de conexión PostgreSQL.
+2. Copie `secret_config_sample.py` como `secret_config.py` en la raíz del
+   proyecto y complete allí los datos locales de conexión PostgreSQL. El
+   archivo de ejemplo se versiona sin credenciales; `secret_config.py` está
+   excluido de Git.
 3. Ejecute `sql/crear_simulaciones_credito.sql` contra esa base de datos.
 4. Corra las pruebas con `python -m unittest test.test_credito test.test_simulaciones_credito_controller`.
+
+Al clonar el repositorio, cada desarrollador debe crear su propio
+`secret_config.py` a partir de `secret_config_sample.py`; el archivo con las credenciales no
+se distribuye en Git.
 
 El historial puede usarse desde Python construyendo una instancia de
 `SolicitudCredito` del modelo y pasándola a
 `SimulacionesCreditoController.guardar()`. Los scripts restantes permiten
 insertar una simulación de ejemplo y consultar el historial directamente desde
 PostgreSQL.
+
+### Pruebas de integración con PostgreSQL
+
+Las pruebas de integración recrean la tabla leyendo
+`sql/crear_simulaciones_credito.sql` antes de cada caso y limpian sus datos al
+terminar. Para proteger la base normal, solo se permite hacerlo en una base
+cuyo nombre termine en `_test`. Cree una base separada con ese sufijo y actívelas
+en PowerShell:
+
+```powershell
+$env:RUN_POSTGRES_TESTS = "1"
+python -m unittest test.test_simulaciones_credito_postgres
+```
+
+### Guardar y buscar desde la consola
+
+Para registrar una simulación o buscarla por el ID que genera la base de datos:
+
+```powershell
+python src/view/console/historial_simulaciones.py
+```
+
+La opción de guardar solicita los datos del crédito, calcula la cuota y guarda
+la simulación. La opción de búsqueda muestra los datos y resultados persistidos.
 
 ---
 

@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Any, Iterator
 
 from model.logica_credito import (
@@ -21,7 +22,7 @@ class SimulacionesCreditoController:
             if error.name != "secret_config":
                 raise
             raise RuntimeError(
-                "Falta secret_config.py. Copia secret_config.example.py como "
+                "Falta secret_config.py. Copia secret_config_sample.py como "
                 "secret_config.py y configura los datos locales de PostgreSQL."
             ) from error
 
@@ -170,3 +171,24 @@ class SimulacionesCreditoController:
                     "vaciar una base cuyo nombre termine en '_test'."
                 )
             cursor.execute("DELETE FROM simulaciones_credito")
+
+    @staticmethod
+    def _recrear_tabla_para_pruebas() -> None:
+        """Recrea la tabla desde el SQL del proyecto únicamente en una base _test."""
+        schema_path = (
+            Path(__file__).resolve().parents[2]
+            / "sql"
+            / "crear_simulaciones_credito.sql"
+        )
+        schema = schema_path.read_text(encoding="utf-8")
+
+        with SimulacionesCreditoController._cursor() as cursor:
+            cursor.execute("SELECT current_database()")
+            database = cursor.fetchone()
+            if database is None or not str(database[0]).endswith("_test"):
+                raise RuntimeError(
+                    "Se rechazó recrear la tabla: las pruebas solo pueden "
+                    "modificar una base cuyo nombre termine en '_test'."
+                )
+            cursor.execute("DROP TABLE IF EXISTS simulaciones_credito")
+            cursor.execute(schema)
