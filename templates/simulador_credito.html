@@ -171,6 +171,22 @@
             <button type="submit">Calcular crédito</button>
         </form>
 
+        <h2>Buscar una simulación</h2>
+        <form action="{{ url_for('buscar_simulacion') }}" method="get">
+            <label for="id_simulacion">
+                ID de la simulación
+                <input
+                    id="id_simulacion"
+                    name="id_simulacion"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                >
+            </label>
+            <button type="submit">Buscar simulación</button>
+        </form>
+
         {% if error %}
         <section class="error" role="alert">
             <strong>No se pudo calcular:</strong> {{ error }}

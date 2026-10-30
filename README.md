@@ -227,13 +227,17 @@ MontoInvalido: se recibio monto_credito=0.0, pero el monto del credito debe ser 
 ## Interfaz web con Flask
 
 La aplicación web reutiliza el modelo y el controlador de simulaciones. La ruta
-`/` muestra la página principal, `/simular` presenta el formulario HTML y
-`/calcular` recibe los datos mediante parámetros GET, construye una
-`SolicitudCredito`, calcula los resultados y guarda la simulación en PostgreSQL.
-La página de resultado muestra el ID generado y los datos del crédito. La tasa
-se ingresa como porcentaje (por ejemplo, `1.5`) y se convierte a decimal para
-el modelo. Los campos faltantes, valores no numéricos y errores conocidos de
-validación o configuración se informan en el formulario.
+`/` muestra la página principal, `/simular` presenta los formularios para
+registrar una simulación y buscarla por ID. La ruta `/calcular` recibe los datos
+mediante parámetros GET, construye una `SolicitudCredito`, calcula los
+resultados y guarda la simulación en PostgreSQL. La ruta `/buscar` consulta el
+controlador y muestra una tabla con los datos encontrados o un mensaje si el
+ID no existe. En el primer acceso web, la aplicación crea la tabla si hace
+falta con `CREATE TABLE IF NOT EXISTS`; las operaciones del controlador también
+se aseguran de que exista. Esto no borra ni modifica datos cuando la tabla ya
+está creada. La tasa se ingresa como porcentaje (por ejemplo, `1.5`) y se
+convierte a decimal para el modelo. Los campos faltantes, valores no numéricos
+y errores conocidos de validación o configuración se informan al usuario.
 
 Antes de ejecutar la aplicación, configure PostgreSQL siguiendo las
 instrucciones de la sección de historial de simulaciones. Luego, desde la raíz,
@@ -244,8 +248,9 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Abra `http://127.0.0.1:5000` en el navegador. La búsqueda de simulaciones y el
-despliegue de la aplicación no forman parte de esta etapa.
+Abra `http://127.0.0.1:5000` en el navegador. Para buscar, ingrese el ID
+devuelto al registrar una simulación. El despliegue en Render se configura por
+separado.
 
 ---
 
@@ -264,7 +269,9 @@ Para habilitar PostgreSQL:
    proyecto y complete allí los datos locales de conexión PostgreSQL. El
    archivo de ejemplo se versiona sin credenciales; `secret_config.py` está
    excluido de Git.
-3. Ejecute `sql/crear_simulaciones_credito.sql` contra esa base de datos.
+3. La aplicación crea la tabla automáticamente en su primer acceso web. También
+   se puede crear manualmente ejecutando
+   `sql/crear_simulaciones_credito.sql`.
 4. Corra las pruebas con `python -m unittest test.test_credito test.test_simulaciones_credito_controller`.
 
 Al clonar el repositorio, cada desarrollador debe crear su propio

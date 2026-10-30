@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Búsqueda de simulación</title>
+</head>
+<body>
+    {% if error %}
+    <h1>No se encontró la simulación</h1>
+    <p role="alert">{{ error }}</p>
+    {% else %}
+    <h1>Simulación encontrada</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th scope="row">ID</th>
+                <td>{{ simulacion.id }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Fecha de simulación</th>
+                <td>{{ simulacion.fecha_simulacion }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Valor por semestre</th>
+                <td>${{ "{:,.2f}".format(simulacion.monto_credito_semestre) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Cantidad de semestres</th>
+                <td>{{ simulacion.cantidad_semestres }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Monto total desembolsado</th>
+                <td>${{ "{:,.2f}".format(simulacion.monto_total_credito) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Tasa mensual</th>
+                <td>{{ "{:.2f}".format(simulacion.tasa_interes_mensual * 100) }}%</td>
+            </tr>
+            <tr>
+                <th scope="row">Cantidad de cuotas</th>
+                <td>{{ simulacion.cantidad_cuotas }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Periodo de gracia</th>
+                <td>{{ simulacion.periodo_gracia }} meses</td>
+            </tr>
+            <tr>
+                <th scope="row">Cuota mensual</th>
+                <td>${{ "{:,.2f}".format(simulacion.cuota_mensual) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Total pagado</th>
+                <td>${{ "{:,.2f}".format(simulacion.total_pagado) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Total intereses</th>
+                <td>${{ "{:,.2f}".format(simulacion.total_intereses) }}</td>
+            </tr>
+        </tbody>
+    </table>
+    {% endif %}
+
+    <p><a href="{{ url_for('mostrar_formulario') }}">Volver al simulador</a></p>
+</body>
+</html>

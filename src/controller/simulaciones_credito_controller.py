@@ -54,14 +54,33 @@ class SimulacionesCreditoController:
 
     @staticmethod
     @contextmanager
-    def _cursor() -> Iterator[Any]:
+    def _cursor(asegurar_tabla: bool = False) -> Iterator[Any]:
         connection = SimulacionesCreditoController._connect()
         try:
             with connection:
                 with connection.cursor() as cursor:
+                    if asegurar_tabla:
+                        cursor.execute(
+                            SimulacionesCreditoController._leer_esquema_tabla()
+                        )
                     yield cursor
         finally:
             connection.close()
+
+    @staticmethod
+    def _leer_esquema_tabla() -> str:
+        schema_path = (
+            Path(__file__).resolve().parents[2]
+            / "sql"
+            / "crear_simulaciones_credito.sql"
+        )
+        return schema_path.read_text(encoding="utf-8")
+
+    @staticmethod
+    def inicializar_tabla() -> None:
+        """Crea la tabla si no existe, sin modificar los datos existentes."""
+        with SimulacionesCreditoController._cursor(asegurar_tabla=True):
+            pass
 
     @staticmethod
     def _row_as_dict(cursor: Any, row: tuple[Any, ...]) -> dict[str, Any]:
@@ -74,7 +93,7 @@ class SimulacionesCreditoController:
     def guardar(solicitud: SolicitudCredito) -> int:
         """Guarda la solicitud y los resultados calculados; devuelve su identificador."""
         validar_solicitud_credito(solicitud)
-        with SimulacionesCreditoController._cursor() as cursor:
+        with SimulacionesCreditoController._cursor(asegurar_tabla=True) as cursor:
             cursor.execute(
                 """
                 INSERT INTO simulaciones_credito (
@@ -113,7 +132,7 @@ class SimulacionesCreditoController:
     @staticmethod
     def listar() -> list[dict[str, Any]]:
         """Devuelve el historial de simulaciones, de la más reciente a la más antigua."""
-        with SimulacionesCreditoController._cursor() as cursor:
+        with SimulacionesCreditoController._cursor(asegurar_tabla=True) as cursor:
             cursor.execute(
                 """
                 SELECT id, fecha_simulacion, monto_credito_semestre,
@@ -132,7 +151,7 @@ class SimulacionesCreditoController:
     @staticmethod
     def buscar(id_simulacion: int) -> dict[str, Any] | None:
         """Busca una simulación por su identificador; devuelve None si no existe."""
-        with SimulacionesCreditoController._cursor() as cursor:
+        with SimulacionesCreditoController._cursor(asegurar_tabla=True) as cursor:
             cursor.execute(
                 """
                 SELECT id, fecha_simulacion, monto_credito_semestre,
@@ -152,7 +171,7 @@ class SimulacionesCreditoController:
     @staticmethod
     def eliminar(id_simulacion: int) -> bool:
         """Elimina una simulación por su identificador e indica si existía."""
-        with SimulacionesCreditoController._cursor() as cursor:
+        with SimulacionesCreditoController._cursor(asegurar_tabla=True) as cursor:
             cursor.execute(
                 "DELETE FROM simulaciones_credito WHERE id = %s",
                 (id_simulacion,),
@@ -175,12 +194,7 @@ class SimulacionesCreditoController:
     @staticmethod
     def _recrear_tabla_para_pruebas() -> None:
         """Recrea la tabla desde el SQL del proyecto únicamente en una base _test."""
-        schema_path = (
-            Path(__file__).resolve().parents[2]
-            / "sql"
-            / "crear_simulaciones_credito.sql"
-        )
-        schema = schema_path.read_text(encoding="utf-8")
+        schema = SimulacionesCreditoController._leer_esquema_tabla()
 
         with SimulacionesCreditoController._cursor() as cursor:
             cursor.execute("SELECT current_database()")

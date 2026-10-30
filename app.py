@@ -1,4 +1,5 @@
 import sys
+from threading import Lock
 from pathlib import Path
 
 from flask import Flask, render_template, request
@@ -22,6 +23,19 @@ from model.logica_credito import (
 
 
 app = Flask(__name__)
+_database_initialization_lock = Lock()
+
+
+@app.before_request
+def inicializar_base_de_datos():
+    if app.extensions.get("simulaciones_credito_inicializadas"):
+        return
+
+    with _database_initialization_lock:
+        if app.extensions.get("simulaciones_credito_inicializadas"):
+            return
+        SimulacionesCreditoController.inicializar_tabla()
+        app.extensions["simulaciones_credito_inicializadas"] = True
 
 
 @app.get("/")
@@ -107,6 +121,55 @@ def calcular():
         solicitud=solicitud,
         resultado=resultado,
         id_simulacion=id_simulacion,
+    )
+
+
+@app.get("/buscar")
+def buscar_simulacion():
+    id_solicitado = request.args.get("id_simulacion", "").strip()
+    if not id_solicitado:
+        return render_template(
+            "simulacion_buscada.html",
+            simulacion=None,
+            error="Ingresa el ID de la simulación que quieres buscar.",
+        )
+
+    try:
+        id_simulacion = int(id_solicitado)
+    except ValueError:
+        return render_template(
+            "simulacion_buscada.html",
+            simulacion=None,
+            error="El ID de la simulación debe ser un número entero positivo.",
+        )
+
+    if id_simulacion < 1:
+        return render_template(
+            "simulacion_buscada.html",
+            simulacion=None,
+            error="El ID de la simulación debe ser un número entero positivo.",
+        )
+
+    try:
+        simulacion = SimulacionesCreditoController.buscar(id_simulacion)
+    except RuntimeError as error:
+        return render_template(
+            "simulacion_buscada.html",
+            simulacion=None,
+            error=f"No se pudo buscar la simulación: {error}",
+        )
+
+    if simulacion is None:
+        return render_template(
+            "simulacion_buscada.html",
+            simulacion=None,
+            error=f"No existe una simulación con el ID {id_simulacion}.",
+        )
+
+    return render_template(
+        "simulacion_buscada.html",
+        simulacion=simulacion,
+        error=None,
     )
 
 

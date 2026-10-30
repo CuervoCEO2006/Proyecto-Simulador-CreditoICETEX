@@ -59,6 +59,25 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "secret_config.py"):
                 SimulacionesCreditoController._connect()
 
+    @patch.object(
+        Path,
+        "read_text",
+        return_value="CREATE TABLE IF NOT EXISTS simulaciones_credito (id INT);",
+    )
+    @patch.object(SimulacionesCreditoController, "_connect")
+    def test_inicializar_tabla_ejecuta_esquema_idempotente(
+        self, connect, read_schema
+    ):
+        connect.return_value = self.connection
+
+        SimulacionesCreditoController.inicializar_tabla()
+
+        self.cursor.execute.assert_called_once_with(
+            "CREATE TABLE IF NOT EXISTS simulaciones_credito (id INT);"
+        )
+        read_schema.assert_called_once_with(encoding="utf-8")
+        self.connection.close.assert_called_once()
+
     @patch.object(SimulacionesCreditoController, "_connect")
     def test_guardar_persist_credito_educativo_y_devuelve_id(self, connect):
         connect.return_value = self.connection
@@ -67,7 +86,9 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
         id_simulacion = SimulacionesCreditoController.guardar(self.solicitud)
 
         self.assertEqual(42, id_simulacion)
-        query, values = self.cursor.execute.call_args.args
+        schema_query = self.cursor.execute.call_args_list[0].args[0]
+        self.assertIn("CREATE TABLE IF NOT EXISTS", schema_query)
+        query, values = self.cursor.execute.call_args_list[-1].args
         self.assertIn("INSERT INTO simulaciones_credito", query)
         self.assertEqual(
             (
@@ -139,7 +160,7 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
             periodo_gracia=result["periodo_gracia"],
         )
         self.assertEqual(self.solicitud, solicitud_reconstruida)
-        self.cursor.execute.assert_called_once_with(unittest.mock.ANY, (42,))
+        self.cursor.execute.assert_any_call(unittest.mock.ANY, (42,))
 
     @patch.object(SimulacionesCreditoController, "_connect")
     def test_buscar_inexistente_devuelve_none(self, connect):
@@ -192,7 +213,7 @@ class SimulacionesCreditoControllerTest(unittest.TestCase):
         self.cursor.rowcount = 1
 
         self.assertTrue(SimulacionesCreditoController.eliminar(42))
-        self.cursor.execute.assert_called_once_with(
+        self.cursor.execute.assert_any_call(
             "DELETE FROM simulaciones_credito WHERE id = %s",
             (42,),
         )
