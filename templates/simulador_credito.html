@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simulador de crédito ICETEX</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            color: #16324f;
+            background: #f2f6fa;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px #16324f18;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #075985;
+        }
+
+        .description {
+            color: #526579;
+            line-height: 1.5;
+        }
+
+        form {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        label {
+            display: grid;
+            gap: 0.4rem;
+            font-weight: 600;
+        }
+
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #c7d2de;
+            border-radius: 7px;
+            font: inherit;
+        }
+
+        button {
+            padding: 0.85rem;
+            border: 0;
+            border-radius: 7px;
+            color: white;
+            background: #087e8b;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #06636d;
+        }
+
+        .result, .error {
+            margin-top: 1.5rem;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+        }
+
+        .result {
+            background: #e9f8ef;
+            border-left: 5px solid #218838;
+        }
+
+        .error {
+            color: #842029;
+            background: #fcebed;
+            border-left: 5px solid #c0392b;
+        }
+
+        .result p {
+            margin: 0.65rem 0;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Simulador de crédito educativo</h1>
+        <p class="description">
+            Ingresa los datos del crédito para calcular la cuota mensual, el
+            total pagado y los intereses estimados.
+        </p>
+
+        <form action="{{ url_for('calcular') }}" method="get">
+            <label for="monto_credito_semestre">
+                Valor de matrícula por semestre
+                <input
+                    id="monto_credito_semestre"
+                    name="monto_credito_semestre"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    required
+                    value="{{ formulario.get('monto_credito_semestre', '') }}"
+                >
+            </label>
+
+            <label for="cantidad_semestres">
+                Cantidad de semestres
+                <input
+                    id="cantidad_semestres"
+                    name="cantidad_semestres"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    value="{{ formulario.get('cantidad_semestres', '') }}"
+                >
+            </label>
+
+            <label for="tasa_interes_mensual">
+                Tasa de interés mensual (%)
+                <input
+                    id="tasa_interes_mensual"
+                    name="tasa_interes_mensual"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    required
+                    value="{{ formulario.get('tasa_interes_mensual', '') }}"
+                >
+            </label>
+
+            <label for="cantidad_cuotas">
+                Número de cuotas
+                <input
+                    id="cantidad_cuotas"
+                    name="cantidad_cuotas"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    value="{{ formulario.get('cantidad_cuotas', '') }}"
+                >
+            </label>
+
+            <label for="periodo_gracia">
+                Periodo de gracia (meses)
+                <input
+                    id="periodo_gracia"
+                    name="periodo_gracia"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    value="{{ formulario.get('periodo_gracia', '') }}"
+                >
+            </label>
+
+            <button type="submit">Calcular crédito</button>
+        </form>
+
+        {% if error %}
+        <section class="error" role="alert">
+            <strong>No se pudo calcular:</strong> {{ error }}
+        </section>
+        {% endif %}
+
+        {% if resultado %}
+        <section class="result" aria-live="polite">
+            <h2>Resultado</h2>
+            <p>Monto total desembolsado: ${{ "{:,.2f}".format(resultado.monto_total_credito) }}</p>
+            <p>Cuota mensual: ${{ "{:,.2f}".format(resultado.cuota_mensual) }}</p>
+            <p>Total pagado: ${{ "{:,.2f}".format(resultado.total_pagado) }}</p>
+            <p>Total intereses: ${{ "{:,.2f}".format(resultado.total_intereses) }}</p>
+        </section>
+        {% endif %}
+    </main>
+</body>
+</html>

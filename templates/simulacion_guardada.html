@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simulación guardada</title>
+</head>
+<body>
+    <h1>Simulación guardada</h1>
+    <p>La simulación se guardó con el ID {{ id_simulacion }}.</p>
+
+    <table>
+        <tbody>
+            <tr>
+                <th scope="row">Valor por semestre</th>
+                <td>${{ "{:,.2f}".format(solicitud.monto_credito_semestre) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Cantidad de semestres</th>
+                <td>{{ solicitud.cantidad_semestres }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Monto total desembolsado</th>
+                <td>${{ "{:,.2f}".format(resultado.monto_total_credito) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Tasa mensual</th>
+                <td>{{ "{:.2f}".format(solicitud.tasa_interes_mensual * 100) }}%</td>
+            </tr>
+            <tr>
+                <th scope="row">Cantidad de cuotas</th>
+                <td>{{ solicitud.cantidad_cuotas }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Periodo de gracia</th>
+                <td>{{ solicitud.periodo_gracia }} meses</td>
+            </tr>
+            <tr>
+                <th scope="row">Cuota mensual</th>
+                <td>${{ "{:,.2f}".format(resultado.cuota_mensual) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Total pagado</th>
+                <td>${{ "{:,.2f}".format(resultado.total_pagado) }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Total intereses</th>
+                <td>${{ "{:,.2f}".format(resultado.total_intereses) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><a href="{{ url_for('mostrar_formulario') }}">Registrar otra simulación</a></p>
+</body>
+</html>

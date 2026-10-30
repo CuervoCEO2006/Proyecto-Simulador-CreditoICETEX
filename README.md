@@ -35,11 +35,17 @@ Proyecto-Simulador-CreditoICETEX/
 │   └── view/
 │       ├── console/
 │       │   └── consola_credito.py
-│       └── gui/
-│           └── creditoicetex_gui.py
+│       ├── gui/
+│       │   └── creditoicetex_gui.py
+├── app.py
+├── templates/
+│   ├── inicio.html
+│   ├── simulacion_guardada.html
+│   └── simulador_credito.html
 ├── test/
 │   ├── test_simulaciones_credito_controller.py
-│   └── test_credito.py
+│   ├── test_credito.py
+│   └── test_web_credito.py
 ├── sql/
 │   ├── crear_simulaciones_credito.sql
 │   ├── insertar_simulacion_credito.sql
@@ -63,6 +69,12 @@ Desde la raíz del proyecto, ejecute:
 
 ```
 python -m unittest test.test_credito test.test_simulaciones_credito_controller
+```
+
+La interfaz web también tiene pruebas con el cliente de Flask:
+
+```
+python -m unittest test.test_web_credito
 ```
 
 ---
@@ -209,6 +221,31 @@ Numero de cuotas en que va a pagar el credito: 24
 No se pudo calcular la cuota
 MontoInvalido: se recibio monto_credito=0.0, pero el monto del credito debe ser mayor que cero. Ocurrio en validar_monto_credito(), llamada desde calcular_cuota(). Solucion: ingrese un monto de credito positivo.
 ```
+
+---
+
+## Interfaz web con Flask
+
+La aplicación web reutiliza el modelo y el controlador de simulaciones. La ruta
+`/` muestra la página principal, `/simular` presenta el formulario HTML y
+`/calcular` recibe los datos mediante parámetros GET, construye una
+`SolicitudCredito`, calcula los resultados y guarda la simulación en PostgreSQL.
+La página de resultado muestra el ID generado y los datos del crédito. La tasa
+se ingresa como porcentaje (por ejemplo, `1.5`) y se convierte a decimal para
+el modelo. Los campos faltantes, valores no numéricos y errores conocidos de
+validación o configuración se informan en el formulario.
+
+Antes de ejecutar la aplicación, configure PostgreSQL siguiendo las
+instrucciones de la sección de historial de simulaciones. Luego, desde la raíz,
+inicie Flask:
+
+```
+pip install -r requirements.txt
+python app.py
+```
+
+Abra `http://127.0.0.1:5000` en el navegador. La búsqueda de simulaciones y el
+despliegue de la aplicación no forman parte de esta etapa.
 
 ---
 
