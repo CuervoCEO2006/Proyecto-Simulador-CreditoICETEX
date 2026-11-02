@@ -21,6 +21,9 @@ _database_initialization_lock = Lock()
 
 @vista.before_request
 def inicializar_base_de_datos():
+    if request.endpoint == "vista_credito.crear_tablas":
+        return
+
     if current_app.extensions.get("simulaciones_credito_inicializadas"):
         return
 
@@ -34,6 +37,28 @@ def inicializar_base_de_datos():
 @vista.get("/")
 def inicio():
     return render_template("inicio.html")
+
+
+@vista.post("/crear-tablas")
+def crear_tablas():
+    try:
+        SimulacionesCreditoController.inicializar_tabla()
+    except RuntimeError as error:
+        return render_template(
+            "tablas_creadas.html",
+            exito=False,
+            mensaje=str(error),
+        )
+
+    current_app.extensions["simulaciones_credito_inicializadas"] = True
+    return render_template(
+        "tablas_creadas.html",
+        exito=True,
+        mensaje=(
+            "La tabla de simulaciones está lista. Si ya existía, sus datos "
+            "se conservaron."
+        ),
+    )
 
 
 @vista.get("/simular")

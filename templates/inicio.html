@@ -58,6 +58,27 @@
         nav a:hover {
             background: #06636d;
         }
+
+        nav button {
+            display: block;
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 0;
+            border-radius: 7px;
+            color: #fff;
+            background: #075985;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        nav button:hover {
+            background: #16324f;
+        }
+
+        nav form {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -75,6 +96,11 @@
                     <a href="{{ url_for('vista_credito.mostrar_busqueda') }}">
                         Buscar simulación
                     </a>
+                </li>
+                <li>
+                    <form action="{{ url_for('vista_credito.crear_tablas') }}" method="post">
+                        <button type="submit">Crear o verificar tablas de la BD</button>
+                    </form>
                 </li>
             </ul>
         </nav>

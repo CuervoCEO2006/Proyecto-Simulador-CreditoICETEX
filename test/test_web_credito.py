@@ -32,6 +32,26 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertIn(b'href="/simular"', response.data)
         self.assertIn(b'href="/buscar-simulacion"', response.data)
+        self.assertIn(b'action="/crear-tablas"', response.data)
+
+    def test_crear_tablas_inicializa_y_muestra_confirmacion(self):
+        response = self.client.post("/crear-tablas")
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn(b"La tabla de simulaciones est\xc3\xa1 lista", response.data)
+        self.assertIn(b"sus datos se conservaron", response.data)
+        self.inicializar_tabla_mock.assert_called_once_with()
+
+    def test_crear_tablas_muestra_error_de_configuracion(self):
+        self.inicializar_tabla_mock.side_effect = RuntimeError(
+            "Falta secret_config.py."
+        )
+
+        response = self.client.post("/crear-tablas")
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn(b"No se pudo preparar la base de datos", response.data)
+        self.assertIn(b"Falta secret_config.py.", response.data)
 
     def test_formulario_muestra_campos_del_modelo(self):
         response = self.client.get("/simular")

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tablas de la base de datos</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            color: #16324f;
+            background: #f2f6fa;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px #16324f18;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: {% if exito %}#218838{% else %}#842029{% endif %};
+        }
+
+        p {
+            line-height: 1.5;
+        }
+
+        a {
+            color: #075985;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        {% if exito %}
+        <h1>Base de datos lista</h1>
+        {% else %}
+        <h1>No se pudo preparar la base de datos</h1>
+        {% endif %}
+        <p role="{% if exito %}status{% else %}alert{% endif %}">{{ mensaje }}</p>
+        <a href="{{ url_for('vista_credito.inicio') }}">Volver al menú</a>
+    </main>
+</body>
+</html>
