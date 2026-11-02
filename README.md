@@ -36,10 +36,12 @@ capas independientes:
 Proyecto-Simulador-CreditoICETEX/
 ├── app.py
 ├── templates/
+│   ├── buscar_simulacion.html
 │   ├── inicio.html
 │   ├── simulacion_buscada.html
 │   ├── simulacion_guardada.html
-│   └── simulador_credito.html
+│   ├── simulador_credito.html
+│   └── tablas_creadas.html
 ├── src/
 │   ├── controller/
 │   │   └── simulaciones_credito_controller.py
@@ -49,6 +51,8 @@ Proyecto-Simulador-CreditoICETEX/
 │       ├── console/
 │       │   ├── consola_credito.py
 │       │   └── historial_simulaciones.py
+│       ├── web/
+│       │   └── vista_credito.py
 │       ├── gui/
 │       │   └── creditoicetex_gui.py
 ├── test/
@@ -145,24 +149,66 @@ gracia en meses. Convierte la tasa ingresada a decimal antes de llamar al modelo
 
 ## Interfaz web con Flask
 
-La aplicación reutiliza el modelo y el controlador de simulaciones. `/` muestra
-la página principal, `/simular` presenta los formularios, `/calcular` procesa y
-guarda una simulación en PostgreSQL y `/buscar` consulta una simulación por ID.
-La tasa se ingresa como porcentaje (por ejemplo, `1.5`) y se convierte a
-decimal. En el primer acceso web se crea la tabla si hace falta mediante
-`CREATE TABLE IF NOT EXISTS`, sin borrar datos de una tabla existente.
+La aplicación tiene una página de inicio, una página para simular y guardar
+créditos, y otra independiente para buscar simulaciones por ID. Al guardar, la
+web muestra el identificador generado por PostgreSQL. La tasa mensual se
+ingresa como porcentaje (por ejemplo, `1.5`) y se convierte a decimal para el
+cálculo.
 
-Configure PostgreSQL siguiendo la sección
-[Historial de simulaciones ICETEX](#historial-de-simulaciones-icetex). Después,
-desde la raíz, ejecute:
+## Ejecutar la aplicación web localmente con una base de datos vacía
 
-```powershell
-pip install -r requirements.txt
-python app.py
-```
+Estos pasos sirven para preparar una instalación local desde cero. Necesitas
+tener Python y PostgreSQL instalados y el servicio de PostgreSQL iniciado.
 
-Abra `http://127.0.0.1:5000`. Para buscar un registro, ingrese el ID devuelto al
-guardar una simulación.
+1. **Crea una base de datos vacía en PostgreSQL.** Puedes hacerlo desde
+   pgAdmin, o abrir PowerShell y ejecutar:
+
+   ```powershell
+   psql -U postgres -c "CREATE DATABASE simulador_icetex;"
+   ```
+
+   Si el usuario administrador de PostgreSQL no se llama `postgres`, reemplaza
+   ese nombre. La base debe quedar accesible para el usuario que configurarás
+   en el siguiente paso.
+
+2. **Configura la conexión.** Desde la raíz del proyecto, copia el archivo de
+   ejemplo y edita `secret_config.py` con los datos de tu instalación:
+
+   ```powershell
+   Copy-Item secret_config_sample.py secret_config.py
+   ```
+
+   Configura `PG_HOST` (normalmente `localhost`), `PG_DATABASE`
+   (`simulador_icetex` si usaste el comando anterior), `PG_USER`,
+   `PG_PASSWORD` y `PG_PORT` (normalmente `5432`). No compartas ni subas
+   `secret_config.py`; está excluido de Git.
+
+3. **Instala dependencias e inicia Flask.** Desde la raíz:
+
+   ```powershell
+   py -m venv .venv
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+   .\.venv\Scripts\python.exe app.py
+   ```
+
+4. **Abre la aplicación** en <http://127.0.0.1:5000>. Al primer acceso, la
+   aplicación crea automáticamente la tabla `simulaciones_credito` en la base
+   vacía. También puedes usar en el menú **Crear o verificar tablas de la BD**.
+   La creación usa `CREATE TABLE IF NOT EXISTS`: si la tabla ya existe, no
+   elimina ni reemplaza sus registros.
+
+   Si prefieres crearla manualmente en lugar de usar la creación automática o
+   el menú, ejecuta desde la raíz del proyecto:
+
+   ```powershell
+   psql -U postgres -d simulador_icetex -f sql/crear_simulaciones_credito.sql
+   ```
+
+   Reemplaza el usuario y el nombre de la base si configuraste valores
+   diferentes en `secret_config.py`.
+
+Desde el inicio puedes elegir **Simular crédito** o **Buscar simulación**. Al
+guardar un cálculo, conserva el ID que se muestra para poder buscarlo después.
 
 ---
 
@@ -173,14 +219,12 @@ El controlador guarda los datos de la solicitud y los resultados en la tabla
 El proyecto no almacena datos de tarjetas de crédito. El controlador permite
 guardar, listar, buscar por ID y eliminar simulaciones.
 
-Para usar PostgreSQL localmente:
-
-1. Instale las dependencias con `pip install -r requirements.txt`.
-2. Copie `secret_config_sample.py` como `secret_config.py` en la raíz del
-   proyecto y complete los datos locales de conexión. `secret_config.py` se
-   ignora en Git; no comparta ni suba sus credenciales.
-3. La tabla se crea automáticamente en el primer acceso web. También puede
-   ejecutarse manualmente `sql/crear_simulaciones_credito.sql`.
+La configuración local de PostgreSQL y los pasos para crear una base vacía se
+describen en [Ejecutar la aplicación web localmente con una base de datos
+vacía](#ejecutar-la-aplicación-web-localmente-con-una-base-de-datos-vacía).
+La aplicación crea la tabla al iniciar su primer acceso web. Si se desea
+crearla manualmente, ejecute `sql/crear_simulaciones_credito.sql` conectado a
+la base `simulador_icetex` (o a la base indicada en `PG_DATABASE`).
 
 ### Pruebas de integración con PostgreSQL
 
