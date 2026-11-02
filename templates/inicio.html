@@ -4,10 +4,80 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Simulador de crédito ICETEX</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            color: #16324f;
+            background: #f2f6fa;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px #16324f18;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #075985;
+        }
+
+        p {
+            color: #526579;
+            line-height: 1.5;
+        }
+
+        nav ul {
+            display: grid;
+            gap: 1rem;
+            padding: 0;
+            margin: 1.5rem 0 0;
+            list-style: none;
+        }
+
+        nav a {
+            display: block;
+            padding: 0.9rem 1rem;
+            border-radius: 7px;
+            color: #fff;
+            background: #087e8b;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            background: #06636d;
+        }
+    </style>
 </head>
 <body>
-    <h1>Simulador de crédito educativo</h1>
-    <p>Bienvenido al simulador de crédito ICETEX.</p>
-    <a href="{{ url_for('vista_credito.mostrar_formulario') }}">Ingresar datos del crédito</a>
+    <main>
+        <h1>Simulador de crédito educativo</h1>
+        <p>Bienvenido al simulador de crédito ICETEX.</p>
+        <nav aria-label="Menú principal">
+            <ul>
+                <li>
+                    <a href="{{ url_for('vista_credito.mostrar_formulario') }}">
+                        Simular crédito
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('vista_credito.mostrar_busqueda') }}">
+                        Buscar simulación
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </main>
 </body>
 </html>

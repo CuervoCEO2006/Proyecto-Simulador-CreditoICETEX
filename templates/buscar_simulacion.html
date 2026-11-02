@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Buscar simulación</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Segoe UI", sans-serif;
+            color: #16324f;
+            background: #f2f6fa;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px #16324f18;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #075985;
+        }
+
+        p {
+            color: #526579;
+            line-height: 1.5;
+        }
+
+        form {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        label {
+            display: grid;
+            gap: 0.4rem;
+            font-weight: 600;
+        }
+
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #c7d2de;
+            border-radius: 7px;
+            font: inherit;
+        }
+
+        button, .navigation-link {
+            display: inline-block;
+            padding: 0.85rem 1rem;
+            border: 0;
+            border-radius: 7px;
+            color: #fff;
+            background: #087e8b;
+            font: inherit;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button:hover, .navigation-link:hover {
+            background: #06636d;
+        }
+
+        .navigation-link {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Buscar una simulación</h1>
+        <p>Ingresa el ID que se generó al guardar la simulación.</p>
+
+        <form action="{{ url_for('vista_credito.buscar_simulacion') }}" method="get">
+            <label for="id_simulacion">
+                ID de la simulación
+                <input
+                    id="id_simulacion"
+                    name="id_simulacion"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                >
+            </label>
+            <button type="submit">Buscar simulación</button>
+        </form>
+
+        <a class="navigation-link" href="{{ url_for('vista_credito.inicio') }}">
+            Volver al inicio
+        </a>
+    </main>
+</body>
+</html>

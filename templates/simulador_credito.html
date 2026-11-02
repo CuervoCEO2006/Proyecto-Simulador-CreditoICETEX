@@ -72,6 +72,22 @@
             background: #06636d;
         }
 
+        .navigation-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 7px;
+            color: #fff;
+            background: #075985;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .navigation-link:hover {
+            background: #16324f;
+        }
+
         .result, .error {
             margin-top: 1.5rem;
             padding: 1rem 1.25rem;
@@ -171,21 +187,9 @@
             <button type="submit">Calcular crédito</button>
         </form>
 
-        <h2>Buscar una simulación</h2>
-        <form action="{{ url_for('vista_credito.buscar_simulacion') }}" method="get">
-            <label for="id_simulacion">
-                ID de la simulación
-                <input
-                    id="id_simulacion"
-                    name="id_simulacion"
-                    type="number"
-                    min="1"
-                    step="1"
-                    required
-                >
-            </label>
-            <button type="submit">Buscar simulación</button>
-        </form>
+        <a class="navigation-link" href="{{ url_for('vista_credito.inicio') }}">
+            Volver al inicio
+        </a>
 
         {% if error %}
         <section class="error" role="alert">

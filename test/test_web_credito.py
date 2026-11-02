@@ -31,6 +31,7 @@ class SimuladorCreditoWebTest(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertIn(b'href="/simular"', response.data)
+        self.assertIn(b'href="/buscar-simulacion"', response.data)
 
     def test_formulario_muestra_campos_del_modelo(self):
         response = self.client.get("/simular")
@@ -41,6 +42,13 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         self.assertIn(b'name="tasa_interes_mensual"', response.data)
         self.assertIn(b'name="cantidad_cuotas"', response.data)
         self.assertIn(b'name="periodo_gracia"', response.data)
+        self.assertNotIn(b'name="id_simulacion"', response.data)
+
+    def test_pagina_buscar_muestra_su_formulario_independiente(self):
+        response = self.client.get("/buscar-simulacion")
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn(b'name="id_simulacion"', response.data)
         self.assertIn(b'action="/buscar"', response.data)
         self.assertIn(b'name="id_simulacion"', response.data)
 

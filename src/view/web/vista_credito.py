@@ -46,6 +46,11 @@ def mostrar_formulario():
     )
 
 
+@vista.get("/buscar-simulacion")
+def mostrar_busqueda():
+    return render_template("buscar_simulacion.html")
+
+
 @vista.get("/calcular")
 def calcular():
     formulario = {
