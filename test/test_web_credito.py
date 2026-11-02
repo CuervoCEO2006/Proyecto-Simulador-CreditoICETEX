@@ -14,7 +14,7 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         app.config.update(TESTING=True)
         app.extensions.pop("simulaciones_credito_inicializadas", None)
         self.inicializar_tabla = patch(
-            "app.SimulacionesCreditoController.inicializar_tabla"
+            "view.web.vista_credito.SimulacionesCreditoController.inicializar_tabla"
         )
         self.inicializar_tabla_mock = self.inicializar_tabla.start()
         self.addCleanup(self.inicializar_tabla.stop)
@@ -44,7 +44,10 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         self.assertIn(b'action="/buscar"', response.data)
         self.assertIn(b'name="id_simulacion"', response.data)
 
-    @patch("app.SimulacionesCreditoController.guardar", return_value=42)
+    @patch(
+        "view.web.vista_credito.SimulacionesCreditoController.guardar",
+        return_value=42,
+    )
     def test_calcular_guarda_y_muestra_los_resultados(self, guardar):
         datos = {
             "monto_credito_semestre": "1500000",
@@ -56,7 +59,9 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         response = self.client.get("/calcular", query_string=datos)
 
         self.assertEqual(200, response.status_code)
-        self.assertIn(b"La simulaci\xc3\xb3n se guard\xc3\xb3 con el ID 42", response.data)
+        self.assertIn(
+            b"La simulaci\xc3\xb3n se guard\xc3\xb3 con el ID 42", response.data
+        )
         self.assertIn(b"$293,909.06", response.data)
         self.assertIn(b"$7,053,817.53", response.data)
         self.assertIn(b"$1,053,817.53", response.data)
@@ -104,7 +109,7 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         self.assertNotIn(b"Cuota mensual:", response.data)
 
     @patch(
-        "app.SimulacionesCreditoController.guardar",
+        "view.web.vista_credito.SimulacionesCreditoController.guardar",
         side_effect=RuntimeError("Falta secret_config.py."),
     )
     def test_calcular_muestra_error_si_no_puede_guardar(self, guardar):
@@ -125,7 +130,7 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         guardar.assert_called_once()
 
     @patch(
-        "app.SimulacionesCreditoController.buscar",
+        "view.web.vista_credito.SimulacionesCreditoController.buscar",
         return_value={
             "id": 42,
             "fecha_simulacion": "2026-10-23",
@@ -150,7 +155,10 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         self.assertIn(b"$7,053,817.53", response.data)
         buscar.assert_called_once_with(42)
 
-    @patch("app.SimulacionesCreditoController.buscar", return_value=None)
+    @patch(
+        "view.web.vista_credito.SimulacionesCreditoController.buscar",
+        return_value=None,
+    )
     def test_buscar_informa_si_no_existe_la_simulacion(self, buscar):
         response = self.client.get("/buscar", query_string={"id_simulacion": "987"})
 
@@ -159,7 +167,9 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         self.assertNotIn(b"Simulaci\xc3\xb3n encontrada", response.data)
         buscar.assert_called_once_with(987)
 
-    @patch("app.SimulacionesCreditoController.buscar")
+    @patch(
+        "view.web.vista_credito.SimulacionesCreditoController.buscar"
+    )
     def test_buscar_rechaza_un_id_que_no_es_entero(self, buscar):
         response = self.client.get("/buscar", query_string={"id_simulacion": "abc"})
 
@@ -167,7 +177,9 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         self.assertIn(b"debe ser un n\xc3\xbamero entero positivo", response.data)
         buscar.assert_not_called()
 
-    @patch("app.SimulacionesCreditoController.buscar")
+    @patch(
+        "view.web.vista_credito.SimulacionesCreditoController.buscar"
+    )
     def test_buscar_informa_si_falta_el_id(self, buscar):
         response = self.client.get("/buscar")
 
@@ -176,7 +188,7 @@ class SimuladorCreditoWebTest(unittest.TestCase):
         buscar.assert_not_called()
 
     @patch(
-        "app.SimulacionesCreditoController.buscar",
+        "view.web.vista_credito.SimulacionesCreditoController.buscar",
         side_effect=RuntimeError("Falta secret_config.py."),
     )
     def test_buscar_muestra_error_de_configuracion(self, buscar):

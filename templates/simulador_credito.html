@@ -102,7 +102,7 @@
             total pagado y los intereses estimados.
         </p>
 
-        <form action="{{ url_for('calcular') }}" method="get">
+        <form action="{{ url_for('vista_credito.calcular') }}" method="get">
             <label for="monto_credito_semestre">
                 Valor de matrícula por semestre
                 <input
@@ -172,7 +172,7 @@
         </form>
 
         <h2>Buscar una simulación</h2>
-        <form action="{{ url_for('buscar_simulacion') }}" method="get">
+        <form action="{{ url_for('vista_credito.buscar_simulacion') }}" method="get">
             <label for="id_simulacion">
                 ID de la simulación
                 <input
